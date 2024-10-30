@@ -17,27 +17,62 @@ describe('Restaurant and Menu Models', () => {
     });
 
     test('can create a Restaurant', async () => {
-        // TODO - write test
-        expect('NO TEST').toEqual('EXPECTED DATA')
+        const restaurant = await Restaurant.create({
+            name: 'The Great Restaurant',
+            location: '123 Food St',
+            cuisine: 'International',
+          });
+      
+          expect(restaurant.name).toBe('The Great Restaurant');
+          expect(restaurant.location).toBe('123 Food St');
+          expect(restaurant.cuisine).toBe('International');
     });
 
     test('can create a Menu', async () => {
-        // TODO - write test
-        expect('NO TEST').toEqual('EXPECTED DATA')
+        const restaurant = await Restaurant.create({
+            name: 'The Great Restaurant',
+            location: '123 Food St',
+            cuisine: 'International',
+          });
+      
+          const menu = await Menu.create({
+            restaurantId: restaurant.id,
+            title: 'Lunch Menu',
+            description: 'A delicious selection of lunch items.',
+          });
+      
+          expect(menu.title).toBe('Lunch Menu');
+          expect(menu.description).toBe('A delicious selection of lunch items.');
+          expect(menu.restaurantId).toBe(restaurant.id);
     });
 
     test('can find Restaurants', async () => {
-        // TODO - write test
-        expect('NO TEST').toEqual('EXPECTED DATA')
+        await Restaurant.bulkCreate(seedRestaurant);
+
+        // Query all restaurants
+        const foundRestaurants = await Restaurant.findAll();
+
+        expect(foundRestaurants.length).toBe(seedRestaurant.length);
     });
 
     test('can find Menus', async () => {
-        // TODO - write test
-        expect('NO TEST').toEqual('EXPECTED DATA')
+        const restaurant = await Restaurant.create(seedRestaurant[0]);
+        await Menu.bulkCreate(seedMenu.map(menu => ({
+            ...menu,
+            restaurantId: restaurant.id, // Associate menu with restaurant
+        })));
+
+        const foundMenus = await Menu.findAll();
+
+        expect(foundMenus.length).toBe(seedMenu.length);
     });
 
     test('can delete Restaurants', async () => {
-        // TODO - write test
-        expect('NO TEST').toEqual('EXPECTED DATA')
+        const restaurant = await Restaurant.create(seedRestaurant[0]);
+
+        await restaurant.destroy();
+        const foundRestaurant = await Restaurant.findByPk(restaurant.id);
+
+        expect(foundRestaurant).toBeNull();
     });
 })
