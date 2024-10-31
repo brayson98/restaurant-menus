@@ -1,5 +1,5 @@
-const {sequelize} = require('./db')
-const {Restaurant, Menu} = require('./models/index')
+const db = require('./db')
+const {Restaurant, Menu, Item} = require('./models/index')
 const {
     seedRestaurant,
     seedMenu,
@@ -13,7 +13,7 @@ describe('Restaurant and Menu Models', () => {
         // the 'sync' method will create tables based on the model class
         // by setting 'force:true' the tables are recreated each time the 
         // test suite is run
-        await sequelize.sync({ force: true });
+        await db.sync({ force: true });
     });
 
     test('can create a Restaurant', async () => {
@@ -74,5 +74,42 @@ describe('Restaurant and Menu Models', () => {
         const foundRestaurant = await Restaurant.findByPk(restaurant.id);
 
         expect(foundRestaurant).toBeNull();
+    });
+
+    test('should associate multiple Menus with a Restaurant', async () => {
+        const restaurant = await Restaurant.create({
+            name: 'Pizza Place',
+            location: '123 Main St',
+            cuisine: "Italian"
+        });
+
+        const menu1 = await Menu.create({
+            title: 'Margherita Pizza',
+            restaurantId: restaurant.id
+        });
+
+        const menu2 = await Menu.create({
+            title: 'Pepperoni Pizza',
+            restaurantId: restaurant.id
+        });
+
+        const menus = await restaurant.getMenus(); // Use the generated getMenus method from the association
+        expect(menus).toHaveLength(2); // Check that there are 2 menus associated with the restaurant
+        expect(menus[0].title).toBe('Margherita Pizza');
+        expect(menus[1].title).toBe('Pepperoni Pizza');
+    });
+
+    test('can create an Item', async () => {
+        const item = await Item.create({
+            name: 'Bacon',
+            image: 'test',
+            price: 4.99,
+            vegetarian: false
+          });
+      
+          expect(item.name).toBe('Bacon');
+          expect(item.iamge).toBe('test');
+          expect(item.price).toBe(4.99);
+          expect(item.vegetarian).toBe(false);
     });
 })

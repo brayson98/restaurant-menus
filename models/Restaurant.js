@@ -9,4 +9,4 @@ const Restaurant = db.define("Restaurant", {
     cuisine: DataTypes.STRING
 })
 
-module.exports = {Restaurant};
+module.exports = Restaurant;
